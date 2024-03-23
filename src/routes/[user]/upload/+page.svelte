@@ -1,7 +1,6 @@
 <script>
 // @ts-nocheck
     export let data;
-    import { enhance } from '$app/forms';
 
     $: user = data.user ?? "unknown individual that shouldn't be here";
     let images = [];
@@ -156,7 +155,6 @@
         enctype="multipart/form-data"
 
         action="?/upload"
-        use:enhance
         on:dragover={(e) => { e.preventDefault(); }} 
         on:drop={dropImage}
     >

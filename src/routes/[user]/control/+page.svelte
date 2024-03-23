@@ -1,7 +1,6 @@
 <script>
-// @ts-nocheck
-    import { enhance } from '$app/forms';
-
+    // @ts-nocheck
+    import { local } from "$lib";
     /**
      * TODO: If you can, have the selectedEmotion be the current emotion when the page loads
      */
@@ -20,30 +19,33 @@
     ////////////////////////////////////
     // GET LIST OF AVAILABLE EMOTIONS //
     ////////////////////////////////////
-    let images;
+    let images = {};
     let emotionsSet = new Set();
     let emotionsArray = [];
 
-    switch (user) {
-        case "Naka": 
-            images = import.meta.glob('../../../lib/vtubers/Naka/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
-        case "Zuzu": 
-            images = import.meta.glob('../../../lib/vtubers/Zuzu/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
-        case "Kuro":
-            images = import.meta.glob('../../../lib/vtubers/Kuro/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
-        case "Ghost": 
-            images = import.meta.glob('../../../lib/vtubers/Ghost/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
+    if($local){
+        switch (user) {
+            case "Naka": 
+                images = import.meta.glob('../../../lib/vtubers/Naka/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+            case "Zuzu": 
+                images = import.meta.glob('../../../lib/vtubers/Zuzu/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+            case "Kuro":
+                images = import.meta.glob('../../../lib/vtubers/Kuro/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+            case "Ghost": 
+                images = import.meta.glob('../../../lib/vtubers/Ghost/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+        }
     }
-    
+
     $: relativeImagesArray = Object.keys(images);
-    $: imagesArray = relativeImagesArray.map((image)=>{
-        return image.replace("../../../", "/src/")
-    });
-    // console.log("imagesArray", imagesArray);
+    $: imagesArray = $local ? 
+        relativeImagesArray.map((image)=>{
+            return image.replace("../../../", "/src/")
+        })
+        : data.imageLinks;
 
     $: emotionsArray = imagesArray?.map(imageSrc => {
         const fileName = imageSrc.split("/")[imageSrc.split("/").length-1]
@@ -63,7 +65,6 @@
     enctype="multipart/form-data"
 
     action="?/changeEmotion"
-    use:enhance
 >
     <div id="sign-in-box" class="bg-[#99CCFF] flex flex-col px-7 py-4 text-center">
         <h1 class="text-3xl font-bold underline mb-1">Which {user} are you?</h1>

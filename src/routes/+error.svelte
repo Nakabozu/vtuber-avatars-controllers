@@ -9,7 +9,7 @@
 		What'd ya up and do? Try to bust in with the wrong name or didja break my whole app?
 	</p>
 	<p>
-		If it's the former, this thing is only configured to work specific people, and you're apparently not one of them!
+		If it's the former, this thing is only configured to work with specific people, and you're apparently not one of them!
 		If it's the latter, tell me what you did so I can fix it.
 	</p>
 </article>

@@ -3,6 +3,7 @@
     // PROPS
     export let data;
     // IMPORTS
+    import { local } from "$lib";
     const usersEmotions = data?.usersEmotions;
     // STATE
     const user = data.user;
@@ -10,32 +11,30 @@
     ////////////////////////////////////
     // GET LIST OF AVAILABLE EMOTIONS //
     ////////////////////////////////////
-    let images;
-    let emotionsSet = new Set();
-    let emotionsArray = [];
+    let images = {};
 
-    switch (user) {
-        case "Naka": 
-            images = import.meta.glob('../../../lib/vtubers/Naka/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
-        case "Zuzu": 
-            images = import.meta.glob('../../../lib/vtubers/Zuzu/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
-        case "Kuro":
-            images = import.meta.glob('../../../lib/vtubers/Kuro/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
-        case "Ghost": 
-            images = import.meta.glob('../../../lib/vtubers/Ghost/*.(jpg|jpeg|svg|png)', {eager: true})
-            break;
+    if($local){
+        switch (user) {
+            case "Naka": 
+                images = import.meta.glob('../../../lib/vtubers/Naka/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+            case "Zuzu": 
+                images = import.meta.glob('../../../lib/vtubers/Zuzu/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+            case "Kuro":
+                images = import.meta.glob('../../../lib/vtubers/Kuro/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+            case "Ghost": 
+                images = import.meta.glob('../../../lib/vtubers/Ghost/*.(jpg|jpeg|svg|png)', {eager: true})
+                break;
+        }
     }
-    
     $: relativeImagesArray = Object.keys(images);
-    $: imagesArray = relativeImagesArray.map((image)=>{
-        return image.replace("../../../", "/src/")
-    });
-    // console.log("imagesArray", imagesArray);
-
-
+    $: imagesArray = $local ? 
+        relativeImagesArray.map((image)=>{
+            return image.replace("../../../", "/src/")
+        })
+        : data.imageLinks;
 </script>
 
 <article

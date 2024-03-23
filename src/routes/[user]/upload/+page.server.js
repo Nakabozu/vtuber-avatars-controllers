@@ -1,10 +1,39 @@
 // @ts-nocheck
 import { writeFileSync } from 'fs';
 import { fail, redirect } from '@sveltejs/kit'
+import { put } from '@vercel/blob'
+import { BLOB_READ_WRITE_TOKEN } from '$env/static/private'
+
+// Local storage or not.
+const local = false;
+/**
+ * Either uploads a file into the `/src/lib/vtubers/{userName}` folder or the vercel cloud based on the given `uploadDetails`
+ * @param {UploadDetails} uploadDetails 
+ */
+const writeOrPutFile = async (uploadDetails) => {
+    if(uploadDetails.isLocal){
+        writeFileSync(
+            `src/lib/vtubers/${uploadDetails.userName}/${uploadDetails.groupName}-${uploadDetails.isQuiet ? "quiet" : "speak"}${uploadDetails.isBlink ? "-blink" : ""}.${uploadDetails.fileExtension}`, 
+            uploadDetails.file
+        );
+        console.log(`WROTE ${uploadDetails.isQuiet ? "QUIET" : "SPEAK"} ${uploadDetails.isBlink ? "BLINK" : ""} FILE TO LIB!`)
+    }else{
+        const { url } = await put(
+            `${uploadDetails.userName}/${uploadDetails.groupName}-${uploadDetails.isQuiet ? "quiet" : "speak"}${uploadDetails.isBlink ? "-blink" : ""}.${uploadDetails.fileExtension}`, 
+            uploadDetails.file, 
+            {
+                access: 'public',
+                token: BLOB_READ_WRITE_TOKEN,
+            }
+        );
+        console.log(`UPLOADED ${uploadDetails.isQuiet ? "QUIET" : "SPEAK"} ${uploadDetails.isBlink ? "BLINK " : ""}FILE TO VERCEL CLOUD! @${url}`)
+    }
+}
 
 export const actions = {
-    // @ts-ignore
     upload: async ({ request, params }) => {
+        // This needs to be defined outside of the try-catch so we can use it in the redirect.
+        const userName = params.user;
         try {
             const formData = await request.formData();
 
@@ -15,7 +44,6 @@ export const actions = {
             console.dir(params);
 
             const groupName = formData.get("groupName");
-            const userName = params.user;
             const blinks = formData.get("blinks") === "on";
             
             /**@type {File} */
@@ -40,41 +68,60 @@ export const actions = {
 
             if(userName){
                 if(quietFile && quietFileExtension){
-                    writeFileSync(
-                        `src/lib/vtubers/${userName}/${groupName}-quiet.${quietFileExtension}`, 
-                        Buffer.from(await quietFile?.arrayBuffer())
-                    );
-                    console.log("WROTE QUIET FILE!");
+                    writeOrPutFile({
+                        file: Buffer.from(await quietFile?.arrayBuffer()),
+
+                        userName: userName,
+                        groupName: groupName,
+                        fileExtension: quietFileExtension,
+
+                        isLocal: local,
+                        isQuiet: true,
+                        isBlink: false,
+                    });
                 }
                 if(speakFile && speakFileExtension){
-                    writeFileSync(
-                        `src/lib/vtubers/${userName}/${groupName}-speak.${speakFileExtension}`,
-                        Buffer.from(await speakFile?.arrayBuffer())
-                    );
-                    console.log("WROTE SPEAK FILE!");
+                    writeOrPutFile({
+                        file: Buffer.from(await speakFile?.arrayBuffer()),
+
+                        userName: userName,
+                        groupName: groupName,
+                        fileExtension: speakFileExtension,
+
+                        isLocal: local,
+                        isQuiet: false,
+                        isBlink: false,
+                    });
                 }
                 if(blinks){
                     if(quietBlinkFile && quietBlinkFileExtension){
-                        writeFileSync(
-                            `src/lib/vtubers/${userName}/${groupName}-quiet-blink.${quietBlinkFileExtension}`, 
-                            Buffer.from(await quietBlinkFile?.arrayBuffer())
-                        );
-                        console.log("WROTE QUIET BLINK FILE!");
+                        writeOrPutFile({
+                            file: Buffer.from(await quietBlinkFile?.arrayBuffer()),
+    
+                            userName: userName,
+                            groupName: groupName,
+                            fileExtension: quietBlinkFileExtension,
+    
+                            isLocal: local,
+                            isQuiet: true,
+                            isBlink: true,
+                        });
                     }
                     if(speakBlinkFile && speakBlinkFileExtension){
-                        writeFileSync(
-                            `src/lib/vtubers/${userName}/${groupName}-speak-blink.${speakBlinkFileExtension}`,
-                            Buffer.from(await speakBlinkFile?.arrayBuffer())
-                        );
-                        console.log("WROTE SPEAK BLINK FILE!");
+                        writeOrPutFile({
+                            file: Buffer.from(await speakBlinkFile?.arrayBuffer()),
+    
+                            userName: userName,
+                            groupName: groupName,
+                            fileExtension: speakBlinkFileExtension,
+    
+                            isLocal: local,
+                            isQuiet: false,
+                            isBlink: true,
+                        });
                     }
                 }
             }
-            
-            return ({
-                success: true,
-                error: false
-            });
         } catch (err) {
             console.log("oops... broke upload/+page.server.js", err);
             return fail(500, {
@@ -82,5 +129,21 @@ export const actions = {
                 message: `Unexpected failure ${err}`
             });
         }
+
+        // A 303 Redirect is a FORM REDIRECT which tells browsers not to resubmit data when the back button is pressed.
+        redirect(303, `/${userName}/upload`);
     }
 };
+
+/**
+ * @typedef {Object} UploadDetails
+ * @property {string} file - The file to be uploaded to the lib folder or vercel blob
+ * @property {('Naka' | 'Zuzu' | 'Kuro' | 'Ghost')} userName - The name of the user this file will be assigned to.
+ * Determines the folder the file goes in.
+ * @property {string} groupName - Indicates whether the Courage component is present.
+ * @property {string} fileExtension - The file extension of the file to upload to the cloud.
+ * @property {boolean} isLocal - NOT YET IMPLEMENTED! If true, uploads the file to /src/lib/vtubers/{userName} folder.
+ * If false, uploads to the vercel blob.
+ * @property {boolean} isQuiet - Indicates whether the uploaded image is a speaking avatar.
+ * @property {boolean} isBlink - Indicates whether the uploaded image is the blinking version of the avatar.
+ */
