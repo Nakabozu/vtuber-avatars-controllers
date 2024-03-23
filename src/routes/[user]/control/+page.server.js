@@ -1,23 +1,20 @@
 // @ts-nocheck
-import { writeFileSync } from 'fs';
 import { fail, redirect } from '@sveltejs/kit';
 import usersEmotions from '$lib/server/usersEmotions.js';
+import { socket } from '$lib/server/socketClient';
 
-export async function load({ }) {
-	return {
-		usersEmotions: usersEmotions,
-	};
-}
-
+/** @type {import('./$types').Actions} */
 export const actions = {
-    changeEmotion: async ({ request }) => {
+    changeEmotion: async ({ params, request }) => {
         try {
             const formData = await request.formData();
             const selectedEmotion = formData.get("selectedEmotion");
-            const user = formData.get("user");
-            console.log("ACTION - changeEmotion", formData, selectedEmotion, user);
+            console.log("ACTION - changeEmotion", formData, selectedEmotion, params.user);
 
-            usersEmotions[user] = selectedEmotion;
+            usersEmotions[params.user] = selectedEmotion;
+
+            console.log("Here's the socket", socket);
+            socket.emit("client_sets_emotion", params.user, selectedEmotion);
 
             return ({
                 success: true,
@@ -32,5 +29,5 @@ export const actions = {
                 message: `Unexpected failure ${err}`
             });
         }
-    }
+    },
 };

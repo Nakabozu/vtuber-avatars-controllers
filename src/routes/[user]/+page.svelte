@@ -1,6 +1,6 @@
 <script>
     export let data;
-    const user = data.slug;
+    const user = data.user;
 </script>
 
 <article

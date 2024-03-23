@@ -1,6 +1,5 @@
 <script>
 // @ts-nocheck
-    import { onMount } from 'svelte';
     import { enhance } from '$app/forms';
 
     /**
@@ -13,7 +12,6 @@
     export let data;
     console.log("CLIENT DATA", data);
     const user = data.user;
-    let userName = data.user;
     const usersEmotions = data?.usersEmotions;
 
     let startingEmotion = usersEmotions?.[user];
@@ -40,7 +38,7 @@
             images = import.meta.glob('../../../lib/vtubers/Ghost/*.(jpg|jpeg|svg|png)', {eager: true})
             break;
     }
-
+    
     $: relativeImagesArray = Object.keys(images);
     $: imagesArray = relativeImagesArray.map((image)=>{
         return image.replace("../../../", "/src/")
@@ -54,13 +52,8 @@
     });
     $: emotionsSet = new Set(emotionsArray);
 
-    const setSelectedEmotion = (newEmotion) => {
-        selectedEmotion = newEmotion;
-    }
-
-    const setStartingEmotion = (newEmotion) => {
-        startingEmotion = newEmotion;
-    }
+    const slugify = (str = "") =>
+        str.toLowerCase().replace(/ /g, "-").replace(/\./g, "");
 </script>
 
 <form
@@ -78,36 +71,61 @@
             <div class="w-1/3 flex flex-col gap-1 items-center">
                 <!-- I don't know why the heck you can't a variable to the emotionsSet.values() and then use that, but you can't.  It'll break. -->
                 {#each emotionsSet.values() as emotion}
-                    <button class={`w-full ${emotion === selectedEmotion ? "border-2 border-amber-50" : "border border-stone-500"} ${emotion === startingEmotion ? "bg-gradient-to-r from-[#99CCFF] to-amber-50" : ""}`} on:click={()=>setSelectedEmotion(emotion)}>{emotion}</button>
+                    <input
+                        type="radio"
+                        name="selectedEmotion"
+                        id={slugify(emotion)}
+                        value={slugify(emotion)}
+                        class="hidden"
+                        bind:group={selectedEmotion}
+                    />
+                    <label for={slugify(emotion)} class={`w-full ${emotion === selectedEmotion ? "border-2 border-amber-50" : "border border-stone-500"} ${emotion === startingEmotion ? "bg-gradient-to-r from-[#99CCFF] to-amber-50" : ""}`}>
+                        {emotion}
+                    </label>
                 {/each}
             </div>
 
             <div class="w-2/3 flex flex-col grow-1 items-center">
                 <h2 class="text-lg text-center">Preview of new {user}</h2>
                 {#if selectedEmotion}
-                    <div class="flex flex-row">
+                    <div class="grid grid-rows-2 grid-cols-2">
                         {#each imagesArray as image, index}
-                            <div class="flex flex-col justify-center align-middle">
-                                {#if selectedEmotion && image.includes(selectedEmotion)}
-                                    <img src={image} alt={`image-${index}`} width=100 height=100 class="h-[unset]"/>
-                                    {#if image.includes("quiet")}
-                                        Quiet
-                                    {/if}
-                                    {#if image.includes("speak")}
-                                        Speak
-                                    {/if}
+                            {#if image.includes(selectedEmotion)}
+                                {#if !image.includes("blink")}
+                                    <div class="flex flex-col justify-center align-middle row-start-1">
+                                            <img src={image} alt={`image-${index}`} width=100 height=100 class="h-[unset]"/>
+                                            {#if image.includes("quiet")}
+                                                Quiet
+                                            {/if}
+                                            {#if image.includes("speak")}
+                                                Speak
+                                            {/if}
+                                            {#if image.includes("blink")}
+                                                Blink
+                                            {/if}
+                                    </div>
                                 {/if}
-                            </div>
+                                {#if image.includes("blink")}
+                                    <div class="flex flex-col justify-center align-middle row-start-2">
+                                        <img src={image} alt={`image-${index}`} width=100 height=100 class="h-[unset]"/>
+                                        {#if image.includes("quiet")}
+                                            Quiet Blink
+                                        {/if}
+                                        {#if image.includes("speak")}
+                                            Speak Blink
+                                        {/if}
+                                    </div>
+                                {/if}
+
+                            {/if}
                         {/each}
                     </div>
                 {/if}
             </div>
         </div>
     </div>
-    <input type="text" class="hidden" name="selectedEmotion" bind:value={selectedEmotion}/>
-    <input type="text" class="hidden" name="user" bind:value={userName}/>
     {#if selectedEmotion !== startingEmotion}
-        <button type="submit" on:click={() => setStartingEmotion(selectedEmotion)}>Submit</button>
+        <button type="submit" formaction="?/changeEmotion" class="w-full">Submit</button>
     {:else}
         <span class="h-[24px]"/>
     {/if}
