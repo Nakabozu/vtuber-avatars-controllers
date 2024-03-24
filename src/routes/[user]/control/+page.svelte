@@ -70,7 +70,7 @@
         <h1 class="text-3xl font-bold underline mb-1">Which {user} are you?</h1>
         <div class="flex flex-row w-[315px]">
             <div class="w-1/3 flex flex-col gap-1 items-center">
-                <!-- I don't know why the heck you can't a variable to the emotionsSet.values() and then use that, but you can't.  It'll break. -->
+                <!-- I don't know why the heck you can't set a variable to the emotionsSet.values() and then use that, but you can't.  It'll break. -->
                 {#each emotionsSet.values() as emotion}
                     <input
                         type="radio"
@@ -94,16 +94,16 @@
                             {#if image.includes(selectedEmotion)}
                                 {#if !image.includes("blink")}
                                     <div class="flex flex-col justify-center align-middle row-start-1">
-                                            <img src={image} alt={`image-${index}`} width=100 height=100 class="h-[unset]"/>
-                                            {#if image.includes("quiet")}
-                                                Quiet
-                                            {/if}
-                                            {#if image.includes("speak")}
-                                                Speak
-                                            {/if}
-                                            {#if image.includes("blink")}
-                                                Blink
-                                            {/if}
+                                        <img src={image} alt={`image-${index}`} width=100 height=100 class="h-[unset]"/>
+                                        {#if image.includes("quiet")}
+                                            Quiet
+                                        {/if}
+                                        {#if image.includes("speak")}
+                                            Speak
+                                        {/if}
+                                        {#if image.includes("blink")}
+                                            Blink
+                                        {/if}
                                     </div>
                                 {/if}
                                 {#if image.includes("blink")}

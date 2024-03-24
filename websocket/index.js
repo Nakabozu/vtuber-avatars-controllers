@@ -1,14 +1,14 @@
 // @ts-nocheck
 
 import express from "express";
-import http from "http";
+import https from "https";
 import { Server } from "socket.io";
 import cors from "cors";
 
-const PORT = process.env.PORT || 5674;
+const PORT = process.env.WEBSOCKET_PORT || 5674;
 const app = express();
 app.use(cors());
-const server = http.createServer(app);
+const server = https.createServer(app);
 
 console.log("Starting Express Server");
 

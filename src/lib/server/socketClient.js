@@ -1,7 +1,8 @@
 import { io } from "socket.io-client";
+import { WEBSOCKET_SERVER } from '$env/static/private';
+
 
 // The Websocket
 export const socket = io(
-    "ws://localhost:5674"
-    //"wss://134.209.222.229:5100/"
+    `${WEBSOCKET_SERVER}`
 );
