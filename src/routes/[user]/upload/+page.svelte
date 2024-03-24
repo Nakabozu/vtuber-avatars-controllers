@@ -123,16 +123,22 @@
             if(String(e.target.id).includes("quiet-blink")){
                 console.log("Setting quiet blink files to ", e?.dataTransfer?.files);
                 quietBlinkFiles = e?.dataTransfer?.files;
+                quietBlinkInputFileElement.files = e?.dataTransfer?.files;
             }else if(String(e.target.id).includes("speak-blink")){
                 console.log("Setting speak blink files to ", e?.dataTransfer?.files);
                 speakBlinkFiles = e?.dataTransfer?.files;
+                speakBlinkInputFileElement.files = e?.dataTransfer?.files;
             }else if(String(e.target.id).includes("quiet")){
                 console.log("Setting quiet files to ", e?.dataTransfer?.files);
                 quietFiles = e?.dataTransfer?.files;
+                quietInputFileElement.files = e?.dataTransfer?.files;
             }else if(String(e.target.id).includes("speak")){
                 console.log("Setting speak files to ", e?.dataTransfer?.files);
                 speakFiles = e?.dataTransfer?.files;
+                speakInputFileElement.files = e?.dataTransfer?.files;
             }
+        }else{
+            console.error("Whoops... You tried to upload a file that I don't support.");
         }
     }
 </script>
