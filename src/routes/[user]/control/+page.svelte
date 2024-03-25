@@ -80,7 +80,10 @@
                         class="hidden"
                         bind:group={selectedEmotion}
                     />
-                    <label for={slugify(emotion)} class={`w-full ${emotion === selectedEmotion ? "border-2 border-amber-50" : "border border-stone-500"} ${emotion === startingEmotion ? "bg-gradient-to-r from-[#99CCFF] to-amber-50" : ""}`}>
+                    <label for={slugify(emotion)} class={`w-full align-middle pb-4 pt-3
+                        ${emotion === selectedEmotion ? "border-2 border-amber-50" : "border border-stone-500"}
+                        ${emotion === startingEmotion ? "bg-gradient-to-r from-[#99CCFF] to-amber-50" : ""}
+                    `}>
                         {emotion}
                     </label>
                 {/each}
@@ -124,10 +127,6 @@
                 {/if}
             </div>
         </div>
+        <button type="submit" formaction="?/changeEmotion" class="w-full h-[50px] mt-5 border border-stone-500">Submit</button>
     </div>
-    {#if selectedEmotion !== startingEmotion}
-        <button type="submit" formaction="?/changeEmotion" class="w-full">Submit</button>
-    {:else}
-        <span class="h-[24px]"/>
-    {/if}
 </form>

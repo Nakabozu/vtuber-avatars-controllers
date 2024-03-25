@@ -7,7 +7,7 @@ import {configureWebsocket} from "../websocket";
 import { socket } from "$lib/server/socketClient";
 import usersEmotions from '$lib/server/usersEmotions.js';
 
-configureWebsocket();
+// configureWebsocket();
 
 socket.on("server_updates_emotion", (user, emotion)=>{
     console.log(`SvelteKit server noticed that the ${user} updated their emotion to ${emotion}.`);
