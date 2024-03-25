@@ -1,6 +1,7 @@
 <script>
     // @ts-nocheck
-    import { local } from "$lib";
+    import { local, socket } from "$lib";
+    import { onMount } from "svelte";
     /**
      * TODO: If you can, have the selectedEmotion be the current emotion when the page loads
      */
@@ -13,8 +14,16 @@
     const user = data.user;
     const usersEmotions = data?.usersEmotions;
 
-    let startingEmotion = usersEmotions?.[user];
-    let selectedEmotion = usersEmotions?.[user];
+    let startingEmotion = "";
+    let selectedEmotion = "";
+
+    onMount(()=>{
+        socket.emit("client_requests_emotions", (startingUsersEmotions) => {
+            console.log("Requested emotions and got", startingUsersEmotions)
+            startingEmotion = startingUsersEmotions?.[user] ?? "";
+            selectedEmotion = startingUsersEmotions?.[user] ?? "";
+        });
+    })
 
     ////////////////////////////////////
     // GET LIST OF AVAILABLE EMOTIONS //

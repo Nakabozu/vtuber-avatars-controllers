@@ -3,11 +3,24 @@
     // PROPS
     export let data;
     // IMPORTS
-    import { local } from "$lib";
-    const usersEmotions = data?.usersEmotions;
+    import { local, socket } from "$lib";
+    import { onMount } from "svelte";
+    let usersEmotions = data?.usersEmotions;
     // STATE
     const user = data.user;
     $: currentEmotion = usersEmotions[user];
+
+    onMount(()=>{
+        socket.emit("client_requests_emotions", (startingUsersEmotions) => {
+            console.log("Requested emotions and got", startingUsersEmotions)
+            usersEmotions = startingUsersEmotions;
+        });
+    });
+
+    socket.on("server_updates_emotions", (newUsersEmotions) => {
+        usersEmotions = newUsersEmotions;
+    });
+
     ////////////////////////////////////
     // GET LIST OF AVAILABLE EMOTIONS //
     ////////////////////////////////////

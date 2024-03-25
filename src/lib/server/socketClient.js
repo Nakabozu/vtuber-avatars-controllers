@@ -1,8 +1,8 @@
 import { io } from "socket.io-client";
-import { WEBSOCKET_SERVER } from '$env/static/private';
+import { PUBLIC_WEBSOCKET_SERVER } from '$env/static/public';
 
 
 // The Websocket
 export const socket = io(
-    `${WEBSOCKET_SERVER}`
+    `${PUBLIC_WEBSOCKET_SERVER}`
 );
