@@ -12,7 +12,6 @@
     export let data;
     console.log("CLIENT DATA", data);
     const user = data.user;
-    const usersEmotions = data?.usersEmotions;
 
     let startingEmotion = "";
     let selectedEmotion = "";
