@@ -14,7 +14,9 @@ export const actions = {
             usersEmotions[params.user] = selectedEmotion;
 
             console.log("Here's the socket", socket);
-            socket.emit("client_sets_emotion", params.user, selectedEmotion);
+            socket.emit("client_sets_emotion", params.user, selectedEmotion, (newEmotion) => {
+                console.log(`Successfully changed ${params.user} to ${newEmotion}`);
+            });
 
             return ({
                 success: true,

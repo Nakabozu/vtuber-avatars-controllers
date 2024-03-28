@@ -13,16 +13,27 @@
     console.log("CLIENT DATA", data);
     const user = data.user;
 
-    let startingEmotion = "";
+    let socketEmotion = "";
     let selectedEmotion = "";
 
     onMount(()=>{
         socket.emit("client_requests_emotions", (startingUsersEmotions) => {
             console.log("Requested emotions and got", startingUsersEmotions)
-            startingEmotion = startingUsersEmotions?.[user] ?? "";
+            socketEmotion = startingUsersEmotions?.[user] ?? "";
             selectedEmotion = startingUsersEmotions?.[user] ?? "";
         });
     })
+
+    $: {
+        selectedNewEmotion(selectedEmotion);
+    }
+
+    const selectedNewEmotion = (newEmotion) => {
+        socket.emit("client_sets_emotion", user, newEmotion, (updatedEmotion) => {
+            console.log(`Successfully set ${user} to ${updatedEmotion}`);
+            socketEmotion = updatedEmotion
+        });
+    }
 
     ////////////////////////////////////
     // GET LIST OF AVAILABLE EMOTIONS //
@@ -71,8 +82,6 @@
     class="h-full w-full flex flex-col align-center justify-center items-center" 
     method="POST"
     enctype="multipart/form-data"
-
-    action="?/changeEmotion"
 >
     <div id="sign-in-box" class="bg-[#99CCFF] flex flex-col px-7 py-4 text-center">
         <h1 class="text-3xl font-bold underline mb-1">Which {user} are you?</h1>
@@ -90,7 +99,7 @@
                     />
                     <label for={slugify(emotion)} class={`w-full align-middle pb-4 pt-3
                         ${emotion === selectedEmotion ? "border-2 border-amber-50" : "border border-stone-500"}
-                        ${emotion === startingEmotion ? "bg-gradient-to-r from-[#99CCFF] to-amber-50" : ""}
+                        ${emotion === socketEmotion ? "bg-gradient-to-r from-[#99CCFF] to-amber-50" : ""}
                     `}>
                         {emotion}
                     </label>
@@ -135,6 +144,6 @@
                 {/if}
             </div>
         </div>
-        <button type="submit" formaction="?/changeEmotion" class="w-full h-[50px] mt-5 border border-stone-500">Submit</button>
+        <!-- <button type="submit" formaction="?/changeEmotion" class="w-full h-[50px] mt-5 border border-stone-500">Submit</button> -->
     </div>
 </form>
