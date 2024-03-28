@@ -29,10 +29,12 @@
     }
 
     const selectedNewEmotion = (newEmotion) => {
-        socket.emit("client_sets_emotion", user, newEmotion, (updatedEmotion) => {
-            console.log(`Successfully set ${user} to ${updatedEmotion}`);
-            socketEmotion = updatedEmotion
-        });
+        if(newEmotion && typeof newEmotion === "string"){
+            socket.emit("client_sets_emotion", user, newEmotion, (updatedEmotion) => {
+                console.log(`Successfully set ${user} to ${updatedEmotion}`);
+                socketEmotion = updatedEmotion
+            });
+        }
     }
 
     ////////////////////////////////////
