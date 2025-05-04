@@ -56,7 +56,7 @@ export const configureWebsocket = () => {
             }else{
                 socket.emit("nope");
             }
-        });
+        }); 
 
         socket.on("disconnect", () => {
             console.log(`${socket.id} disconnected`);
